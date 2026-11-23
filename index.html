@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>給巧恩的專屬獎勵</title>
+  
+  <!-- 傳給巧恩時會跳出的 LINE 預覽圖卡設定 -->
+  <meta property="og:title" content="🐻 給巧恩的專屬拉拉熊集點卡">
+  <meta property="og:description" content="慢慢收集幸福中 ♡ 集滿 30 點解鎖男朋友的神秘驚喜！">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80">
+  
+  <!-- 載入所需套件 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body class="bg-[#FFFDF7] text-[#5C3317] antialiased selection:bg-[#F8C630] selection:text-white">
+  <div id="root"></div>
+  <script type="text/babel">
+    function App() {
+      const [points, setPoints] = React.useState(() => {
+        const saved = localStorage.getItem('rilakkuma-points');
+        return saved ? parseInt(saved, 10) : 0;
+      });
+      const max = 30;
+      
+      React.useEffect(() => {
+        localStorage.setItem('rilakkuma-points', points);
+      }, [points]);
+      
+      const handleStamp = (i) => {
+        if (points === i) {
+          setPoints(p => p + 1);
+          if (i === 29) {
+            confetti({ 
+              particleCount: 150, 
+              spread: 70, 
+              origin: { y: 0.6 },
+              colors: ['#F8C630', '#5C3317', '#FFFFFF']
+            });
+          }
+        } else if (i < points) {
+          setPoints(i);
+        }
+      };
+
+      return (
+        <div class="max-w-md mx-auto p-4 font-sans">
+          {/* 頂部 Banner 區塊 */}
+          <div class="w-full h-48 mb-4 rounded-2xl overflow-hidden border-2 border-[#5C3317] shadow-sm bg-white">
+            <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="拉拉熊 Banner" />
+          </div>
+
+          {/* 數據卡片 */}
+          <div class="bg-white rounded-[2rem] p-6 shadow-sm border-2 border-[#5C3317] mb-6 relative">
+            <div class="absolute top-4 right-4 bg-[#F8C630] text-xs px-3 py-1.5 rounded-full font-bold shadow-sm">慢慢收集幸福中 ♡</div>
+            <p class="text-sm font-bold mb-2 text-[#5C3317]/80">目前累積點數</p>
+            <div class="flex items-end gap-2 mb-4">
+              <span class="text-6xl font-black text-[#5C3317]">{points}</span>
+              <span class="text-xl font-bold pb-1 text-[#5C3317]/80">/ 30 點</span>
+            </div>
+            <div class="flex justify-between text-xs mb-2 font-bold">
+              <span>再集 {max - points} 點就能兌換獎勵！</span>
+              <span>{Math.round((points/max)*100)}%</span>
+            </div>
+            <div class="h-5 bg-[#FFFDF7] rounded-full overflow-hidden border-2 border-[#5C3317]">
+              <div class="h-full bg-[#F8C630] transition-all duration-500 ease-out" style={{width: `${(points/max)*100}%`}}></div>
+            </div>
+          </div>
+
+          {/* 5x6 集點網格 */}
+          <div class="grid grid-cols-5 gap-2 bg-white p-4 rounded-[2rem] border-2 border-[#5C3317] shadow-sm">
+            {Array.from({length: max}).map((_, i) => (
+              <div key={i} onClick={() => handleStamp(i)}
+                   class={`aspect-square rounded-xl border-2 flex items-center justify-center cursor-pointer transition-all duration-300 ${i < points ? 'border-[#5C3317] bg-[#F8C630] text-3xl shadow-inner scale-95' : 'border-dashed border-[#5C3317]/30 hover:bg-[#FFFDF7]'}`}>
+                {i < points ? '🐻' : <span class="text-[#5C3317]/20 text-xs">🐾</span>}
+              </div>
+            ))}
+          </div>
+
+          {/* 底部驚喜解鎖卡 */}
+          <div class="mt-6 bg-[#F8C630] rounded-[2rem] p-6 text-center border-2 border-[#5C3317] shadow-sm">
+            <div class="text-4xl mb-3 animate-bounce">🎁</div>
+            <h3 class="font-bold text-xl mb-2 text-[#5C3317]">給巧恩的小小驚喜</h3>
+            <p class="text-sm font-bold text-[#5C3317]/80 leading-relaxed">努力集點，<br/>男朋友準備了神秘驚喜給妳 ♡</p>
+            <button class={`mt-5 px-6 py-3.5 rounded-full font-bold w-full transition-all duration-300 border-2 ${points === max ? 'bg-white text-[#5C3317] border-[#5C3317] shadow-[0_4px_0_0_#5C3317] active:shadow-none active:translate-y-1' : 'bg-[#FFFDF7]/50 text-[#5C3317]/40 border-transparent'}`}>
+              {points === max ? '🎉 點擊解鎖專屬獎勵！' : '尚未達成'}
+            </button>
+          </div>
+          
+          <div class="text-center mt-6 text-xs font-bold text-[#5C3317]/40">
+            Made with ♡ by chovy
+          </div>
+        </div>
+      );
+    }
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
