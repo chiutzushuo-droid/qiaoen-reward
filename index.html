@@ -21,10 +21,13 @@
   <div id="root"></div>
   <script type="text/babel">
     function App() {
+      // 從瀏覽器記憶中讀取分數
       const [points, setPoints] = React.useState(() => {
         const saved = localStorage.getItem('rilakkuma-points');
         return saved ? parseInt(saved, 10) : 0;
       });
+      // 新增：控制許願卡彈出視窗的開關
+      const [showModal, setShowModal] = React.useState(false);
       const max = 30;
       
       React.useEffect(() => {
@@ -86,14 +89,34 @@
             <div class="text-4xl mb-3 animate-bounce">🎁</div>
             <h3 class="font-bold text-xl mb-2 text-[#5C3317]">給巧恩的小小驚喜</h3>
             <p class="text-sm font-bold text-[#5C3317]/80 leading-relaxed">努力集點，<br/>男朋友準備了神秘驚喜給妳 ♡</p>
-            <button class={`mt-5 px-6 py-3.5 rounded-full font-bold w-full transition-all duration-300 border-2 ${points === max ? 'bg-white text-[#5C3317] border-[#5C3317] shadow-[0_4px_0_0_#5C3317] active:shadow-none active:translate-y-1' : 'bg-[#FFFDF7]/50 text-[#5C3317]/40 border-transparent'}`}>
-              {points === max ? '🎉 點擊解鎖專屬獎勵！' : '尚未達成'}
+            <button 
+              onClick={() => points === max && setShowModal(true)}
+              class={`mt-5 px-6 py-3.5 rounded-full font-bold w-full transition-all duration-300 border-2 ${points === max ? 'bg-white text-[#5C3317] border-[#5C3317] shadow-[0_4px_0_0_#5C3317] active:shadow-none active:translate-y-1' : 'bg-[#FFFDF7]/50 text-[#5C3317]/40 border-transparent cursor-not-allowed'}`}>
+              {points === max ? '🎉 點擊領取專屬獎勵！' : '尚未達成'}
             </button>
           </div>
           
           <div class="text-center mt-6 text-xs font-bold text-[#5C3317]/40">
             Made with ♡ by chovy
           </div>
+
+          {/* 許願卡彈出視窗 */}
+          {showModal && (
+            <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+              <div class="bg-white rounded-[2rem] p-8 max-w-[85%] w-full text-center border-4 border-[#F8C630] shadow-2xl">
+                <div class="text-6xl mb-4">💌</div>
+                <h2 class="text-2xl font-black text-[#5C3317] mb-3">獲得許願卡！</h2>
+                <p class="text-[#5C3317] font-bold leading-relaxed mb-8">
+                  可以拿許願卡去找<br/>最愛妳的人許願獎品 ♡
+                </p>
+                <button 
+                  onClick={() => setShowModal(false)}
+                  class="bg-[#F8C630] text-[#5C3317] font-bold px-8 py-3.5 rounded-full border-2 border-[#5C3317] shadow-[0_4px_0_0_#5C3317] active:shadow-none active:translate-y-1 w-full">
+                  開心收下 ✨
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       );
     }
