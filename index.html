@@ -21,18 +21,28 @@
   <div id="root"></div>
   <script type="text/babel">
     function App() {
-      // 從瀏覽器記憶中讀取分數
+      // 記憶點數
       const [points, setPoints] = React.useState(() => {
         const saved = localStorage.getItem('rilakkuma-points');
         return saved ? parseInt(saved, 10) : 0;
       });
-      // 新增：控制許願卡彈出視窗的開關
+      // 記憶集滿次數
+      const [cycles, setCycles] = React.useState(() => {
+        const saved = localStorage.getItem('rilakkuma-cycles');
+        return saved ? parseInt(saved, 10) : 0;
+      });
+      
       const [showModal, setShowModal] = React.useState(false);
       const max = 30;
       
+      // 自動存檔機制
       React.useEffect(() => {
         localStorage.setItem('rilakkuma-points', points);
       }, [points]);
+
+      React.useEffect(() => {
+        localStorage.setItem('rilakkuma-cycles', cycles);
+      }, [cycles]);
       
       const handleStamp = (i) => {
         if (points === i) {
@@ -50,6 +60,13 @@
         }
       };
 
+      // 領取獎勵並清零的專屬動作
+      const handleClaim = () => {
+        setShowModal(false);     // 關閉視窗
+        setPoints(0);            // 點數歸零
+        setCycles(c => c + 1);   // 增加一次許願紀錄
+      };
+
       return (
         <div class="max-w-md mx-auto p-4 font-sans">
           {/* 頂部 Banner 區塊 */}
@@ -58,8 +75,15 @@
           </div>
 
           {/* 數據卡片 */}
-          <div class="bg-white rounded-[2rem] p-6 shadow-sm border-2 border-[#5C3317] mb-6 relative">
+          <div class="bg-white rounded-[2rem] p-6 shadow-sm border-2 border-[#5C3317] mb-6 relative pt-12">
+            {/* 動態顯示已許願次數 (大於0次才會出現) */}
+            {cycles > 0 && (
+              <div class="absolute top-4 left-4 bg-[#FFFDF7] text-[#5C3317] text-xs px-3 py-1.5 rounded-full font-bold shadow-sm border-2 border-[#5C3317]">
+                👑 已許願：{cycles} 次
+              </div>
+            )}
             <div class="absolute top-4 right-4 bg-[#F8C630] text-xs px-3 py-1.5 rounded-full font-bold shadow-sm">慢慢收集幸福中 ♡</div>
+            
             <p class="text-sm font-bold mb-2 text-[#5C3317]/80">目前累積點數</p>
             <div class="flex items-end gap-2 mb-4">
               <span class="text-6xl font-black text-[#5C3317]">{points}</span>
@@ -110,7 +134,7 @@
                   可以拿許願卡去找<br/>最愛妳的人許願獎品 ♡
                 </p>
                 <button 
-                  onClick={() => setShowModal(false)}
+                  onClick={handleClaim}
                   class="bg-[#F8C630] text-[#5C3317] font-bold px-8 py-3.5 rounded-full border-2 border-[#5C3317] shadow-[0_4px_0_0_#5C3317] active:shadow-none active:translate-y-1 w-full">
                   開心收下 ✨
                 </button>
